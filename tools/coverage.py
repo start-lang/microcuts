@@ -6,7 +6,7 @@ import re
 
 if __name__ == '__main__':
     """Show .gcov file statistics."""
-    multiline = False
+    multiline_section = True if '-m' in sys.argv else False
     cols = ('Name', 'Lines', 'Miss', 'Cover', 'Missing')
     ts = [15, 6, 6, 8, 10] # table spaces
     t_header = '%%-%ds %%%ds %%%ds %%%ds  %%-%ds' % tuple(ts)
@@ -47,6 +47,8 @@ if __name__ == '__main__':
                     n_sections += (sum(ts) - 4) * ' '
                 else:
                     n_sections += ('%d, ' % sec[0]) if sec[0] == sec[1] else ('%d-%d, ' % tuple(sec))
+            if multiline_section:
+                n_sections = n_sections[:n_sections.rfind('\n')]
             print t_row % (file, line_count, miss, file_coverage, n_sections[:-2])
             total_line_count += line_count
             total_miss += miss

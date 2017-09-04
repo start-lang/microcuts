@@ -2,7 +2,6 @@
 #define ASSERT_H
 
 #ifndef NDEBUG
-#define xstr(s) str(s)
 #   define assert(A) __assert(#A, A, __FILE__, __LINE__)
 #   define assert_eq(A, B) __assert_eq(#A, #B, A, B, __FILE__, __LINE__)
 #   define assert_str_eq(A, B) __assert_str_eq(#A, #B, A, B, __FILE__, __LINE__)

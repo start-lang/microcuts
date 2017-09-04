@@ -6,12 +6,13 @@ import re
 
 if __name__ == '__main__':
     """Show .gcov file statistics."""
+    multiline = False
     cols = ('Name', 'Lines', 'Miss', 'Cover', 'Missing')
-    ts = [15, 6, 6, 8, 9] # table spaces
-    t_header = '%%-%ds %%%ds %%%ds %%%ds %%%ds' % tuple(ts)
+    ts = [15, 6, 6, 8, 10] # table spaces
+    t_header = '%%-%ds %%%ds %%%ds %%%ds  %%-%ds' % tuple(ts)
     t_line = '-' * (sum(ts) + 4)
     ts[3] -= 1
-    t_row = '%%-%ds %%%dd %%%dd %%%d.2f%%%% %%-%ds' % tuple(ts)
+    t_row = '%%-%ds %%%dd %%%dd %%%d.2f%%%%  %%-%ds' % tuple(ts)
     total_line_count = 0
     total_miss = 0
     total_cover = 0
@@ -41,7 +42,11 @@ if __name__ == '__main__':
                 file = file[:(ts[0] - 3)] + '...'
             n_sections = ''
             for sec in miss_sec:
-                n_sections += '%d-%d, ' % tuple(sec)
+                if multiline_section:
+                    n_sections += ('%d\n' % sec[0]) if sec[0] == sec[1] else ('%d-%d\n' % tuple(sec))
+                    n_sections += (sum(ts) - 4) * ' '
+                else:
+                    n_sections += ('%d, ' % sec[0]) if sec[0] == sec[1] else ('%d-%d, ' % tuple(sec))
             print t_row % (file, line_count, miss, file_coverage, n_sections[:-2])
             total_line_count += line_count
             total_miss += miss

@@ -48,7 +48,7 @@ void begin_section(const char* name){
   failed = 0;
 }
 
-void end_section(int action){
+void end_section(){
   if (failed){
 
   } else {

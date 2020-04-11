@@ -12,11 +12,13 @@
 #define KMAG  "\x1B[35m"
 #define KCYN  "\x1B[36m"
 #define KWHT  "\x1B[37m"
+#define LINE  49
 
 int assert_no = INT_MIN;
 int failed = 0;
 char * section_name = NULL;
 int total_failed = 0;
+int print_sec_ok = 1;
 
 void start_tests(){
   assert_no = INT_MIN;
@@ -25,18 +27,24 @@ void start_tests(){
   total_failed = 0;
 }
 
+void printf_line(){
+  for (int i = 0; i < LINE; i++) printf("=");
+  printf("\n");
+}
+
 void end_tests(){
   if (total_failed == 0){
-    printf("%s", KGRN);
-    printf("\n=============================================\n");
+    printf("%s\n", KGRN);
+    printf_line();
     printf("> OK\n");
-    printf("=============================================\n");
+    printf_line();
     printf("%s", KNRM);
   } else {
-    printf("%s", KYEL);
-    printf("\n=============================================\n");
-    printf("> Check messages above. %d assertion%s failed\n", total_failed, (total_failed == 1? "" : "s"));
-    printf("=============================================\n");
+    printf("%s\n", KYEL);
+    printf_line();
+    printf("> Check messages above. %d assertion%s failed\n", total_failed,
+           (total_failed == 1? "" : "s"));
+    printf_line();
     printf("%s", KNRM);
   }
 }
@@ -51,9 +59,9 @@ void begin_section(const char* name){
 void end_section(){
   if (failed){
 
-  } else {
+  } else if (print_sec_ok){
     printf("%s", KGRN);
-    printf("\nAll tests on '%s' passed.\n", section_name);
+    printf("\nAll '%s' tests passed\n", section_name);
     printf("%s", KNRM);
   }
   assert_no = INT_MIN;
@@ -77,7 +85,8 @@ void __assert(const char* expr_str, int a, const char* file, int line){
   assert_no++;
 }
 
-void __assert_eq(const char* expr_str_a, const char* expr_str_b, int a, int b, const char* file, int line){
+void __assert_eq(const char* expr_str_a, const char* expr_str_b, int a, int b,
+                 const char* file, int line){
   if (a != b){
     if (assert_no < 0){
       printf("%s", KRED);
@@ -96,7 +105,8 @@ void __assert_eq(const char* expr_str_a, const char* expr_str_b, int a, int b, c
   assert_no++;
 }
 
-void __assert_str_eq(const char* expr_str_a, const char* expr_str_b, const char* a, const char* b, const char* file, int line){
+void __assert_str_eq(const char* expr_str_a, const char* expr_str_b,
+                     const char* a, const char* b, const char* file, int line){
   if (strcmp(a, b)){
     if (assert_no < 0){
       printf("%s", KRED);

@@ -50,7 +50,7 @@ void end_tests(){
 }
 
 void begin_section(const char* name){
-  section_name = malloc(sizeof(char) * strlen(name));
+  section_name = malloc(sizeof(char) * strlen(name) + 1);
   strcpy(section_name, name);
   assert_no = 1;
   failed = 0;
@@ -66,6 +66,8 @@ void end_section(){
   }
   assert_no = INT_MIN;
   total_failed += failed;
+  free(section_name);
+  section_name = NULL;
 }
 
 void __assert(const char* expr_str, int a, const char* file, int line){

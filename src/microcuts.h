@@ -15,6 +15,7 @@ void start_tests();
 void end_tests();
 void begin_section(const char* name);
 void end_section();
+void set_cleanup(void (*func)(void));
 void __assert(const char* expr_str, int a, const char* file, int line);
 void __assert_eq(const char* expr_str_a, const char* expr_str_b, int a, int b,
                  const char* file, int line);

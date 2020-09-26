@@ -19,6 +19,7 @@ int failed = 0;
 char * section_name = NULL;
 int total_failed = 0;
 int print_sec_ok = 1;
+void (*cleanup_func)(void) = NULL;
 
 void start_tests(){
   assert_no = INT_MIN;
@@ -56,6 +57,10 @@ void begin_section(const char* name){
   failed = 0;
 }
 
+void set_cleanup(void (*func)(void)){
+  cleanup_func = func;
+}
+
 void end_section(){
   if (failed){
 
@@ -85,6 +90,7 @@ void __assert(const char* expr_str, int a, const char* file, int line){
     failed++;
   }
   assert_no++;
+  if (cleanup_func) cleanup_func();
 }
 
 void __assert_eq(const char* expr_str_a, const char* expr_str_b, int a, int b,
@@ -105,6 +111,7 @@ void __assert_eq(const char* expr_str_a, const char* expr_str_b, int a, int b,
     printf(".");
   }
   assert_no++;
+  if (cleanup_func) cleanup_func();
 }
 
 void __assert_str_eq(const char* expr_str_a, const char* expr_str_b,
@@ -125,4 +132,5 @@ void __assert_str_eq(const char* expr_str_a, const char* expr_str_b,
     printf(".");
   }
   assert_no++;
+  if (cleanup_func) cleanup_func();
 }

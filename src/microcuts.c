@@ -106,6 +106,12 @@ void __assert_eq(const char* expr_str_a, const char* expr_str_b, int a, int b,
     printf("Source code:\t%s === %s\n", expr_str_a, expr_str_b);
     printf("Source:\t\t%s, line %d\n",file, line);
     printf("%s", KNRM);
+
+    #ifdef STOPFAIL
+      if (cleanup_func) cleanup_func();
+      exit(1);
+    #endif
+    
     failed++;
   } else {
     printf(".");

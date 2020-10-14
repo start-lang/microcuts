@@ -15,6 +15,4 @@ cov:
 	chmod +x build/test_microcuts && \
 	./build/test_microcuts > /dev/null && \
 	gcov microcuts.c > /dev/null && \
-	./tools/coverage.py && \
-	rm -f *.gc*
-	@ make clean > /dev/null
+	./tools/coverage.py

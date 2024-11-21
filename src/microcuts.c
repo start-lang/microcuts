@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <time.h>
 #include <microcuts.h>
 
 #define KNRM  "\x1B[0m"
@@ -20,12 +21,15 @@ char * section_name = NULL;
 int total_failed = 0;
 int print_sec_ok = 1;
 void (*cleanup_func)(void) = NULL;
+clock_t start = 0;
+clock_t section_start = 0;
 
 void start_tests(){
   assert_no = INT_MIN;
   failed = 0;
   section_name = NULL;
   total_failed = 0;
+  start = clock();
 }
 
 void printf_line(){
@@ -37,7 +41,9 @@ void end_tests(){
   if (total_failed == 0){
     printf("%s\n", KGRN);
     printf_line();
-    printf("> OK\n");
+    clock_t end = clock();
+    double time_spent = (double)(end - start) * 1000 / CLOCKS_PER_SEC;
+    printf("> All tests passed in %.2f ms\n", time_spent);
     printf_line();
     printf("%s", KNRM);
   } else {
@@ -55,6 +61,7 @@ void begin_section(const char* name){
   strcpy(section_name, name);
   assert_no = 1;
   failed = 0;
+  section_start = clock();
 }
 
 void set_cleanup(void (*func)(void)){
@@ -66,7 +73,9 @@ void end_section(){
 
   } else if (print_sec_ok){
     printf("%s", KGRN);
-    printf("\nAll '%s' tests passed\n", section_name);
+    clock_t end = clock();
+    double time_spent = (double)(end - section_start) * 1000 / CLOCKS_PER_SEC;
+    printf("\n\nSection '%s' passed in %.2f ms\n", section_name, time_spent);
     printf("%s", KNRM);
   }
   assert_no = INT_MIN;

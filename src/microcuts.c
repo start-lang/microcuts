@@ -21,6 +21,8 @@ int assert_no = INT_MIN;
 int failed = 0;
 char * section_name = NULL;
 int total_failed = 0;
+int total_asserts = 0;
+int section_asserts = 0;
 void (*cleanup_func)(void) = NULL;
 #ifdef PRINT_TIMINGS
 clock_t start = 0;
@@ -49,9 +51,9 @@ void end_tests(void){
 #ifdef PRINT_TIMINGS
     clock_t end = clock();
     double time_spent = (double)(end - start) * 1000 / CLOCKS_PER_SEC;
-    printf("> All tests passed in %.2f ms\n", time_spent);
+    printf("> %d tests passed in %.2f ms\n", time_spent);
 #else
-    printf("> All tests passed\n");
+    printf("> %d tests passed\n", total_asserts);
 #endif
     printf_line();
     printf("%s", KNRM);
@@ -70,6 +72,7 @@ void begin_section(const char* name){
   strcpy(section_name, name);
   assert_no = 1;
   failed = 0;
+  section_asserts = 0;
 #ifdef PRINT_TIMINGS
     section_start = clock();
 #endif
@@ -84,15 +87,16 @@ void end_section(void){
   printf("%s", KGRN);
   clock_t end = clock();
   double time_spent = (double)(end - section_start) * 1000 / CLOCKS_PER_SEC;
-  printf("\nSection '%s' passed in %.2f ms\n", section_name, time_spent);
+  printf("\n%d tests passed @ '%s' in %.2f ms\n", section_asserts, section_name, time_spent);
   printf("%s", KNRM);
 #else
   printf("%s", KGRN);
-  printf("\nSection '%s' passed\n", section_name);
+  printf("\n%d tests passed @ '%s'\n", section_asserts, section_name);
   printf("%s", KNRM);
 #endif
   assert_no = INT_MIN;
   total_failed += failed;
+  total_asserts += section_asserts;
   free(section_name);
   section_name = NULL;
 }
@@ -112,6 +116,7 @@ void __assert(const char* expr_str, int a, const char* file, int line){
     failed++;
   }
   assert_no++;
+  section_asserts++;
   if (cleanup_func) cleanup_func();
 }
 
@@ -139,6 +144,7 @@ void __assert_eq(const char* expr_str_a, const char* expr_str_b, int a, int b,
     printf(".");
   }
   assert_no++;
+  section_asserts++;
   if (cleanup_func) cleanup_func();
 }
 
@@ -160,5 +166,6 @@ void __assert_str_eq(const char* expr_str_a, const char* expr_str_b,
     printf(".");
   }
   assert_no++;
+  section_asserts++;
   if (cleanup_func) cleanup_func();
 }

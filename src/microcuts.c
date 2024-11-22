@@ -24,7 +24,7 @@ void (*cleanup_func)(void) = NULL;
 clock_t start = 0;
 clock_t section_start = 0;
 
-void start_tests(){
+void start_tests(void){
   assert_no = INT_MIN;
   failed = 0;
   section_name = NULL;
@@ -32,12 +32,12 @@ void start_tests(){
   start = clock();
 }
 
-void printf_line(){
+void printf_line(void){
   for (int i = 0; i < LINE; i++) printf("=");
   printf("\n");
 }
 
-void end_tests(){
+void end_tests(void){
   if (total_failed == 0){
     printf("%s\n", KGRN);
     printf_line();
@@ -68,7 +68,7 @@ void set_cleanup(void (*func)(void)){
   cleanup_func = func;
 }
 
-void end_section(){
+void end_section(void){
   if (failed){
 
   } else if (print_sec_ok){

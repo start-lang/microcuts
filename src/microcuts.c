@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#ifdef PRINT_TIMINGS
 #include <time.h>
+#endif
 #include <microcuts.h>
 
 #define KNRM  "\x1B[0m"
@@ -19,17 +21,20 @@ int assert_no = INT_MIN;
 int failed = 0;
 char * section_name = NULL;
 int total_failed = 0;
-int print_sec_ok = 1;
 void (*cleanup_func)(void) = NULL;
+#ifdef PRINT_TIMINGS
 clock_t start = 0;
 clock_t section_start = 0;
+#endif
 
 void start_tests(void){
   assert_no = INT_MIN;
   failed = 0;
   section_name = NULL;
   total_failed = 0;
+#ifdef PRINT_TIMINGS
   start = clock();
+#endif
 }
 
 void printf_line(void){
@@ -39,15 +44,19 @@ void printf_line(void){
 
 void end_tests(void){
   if (total_failed == 0){
-    printf("%s\n", KGRN);
+    printf("%s", KGRN);
     printf_line();
+#ifdef PRINT_TIMINGS
     clock_t end = clock();
     double time_spent = (double)(end - start) * 1000 / CLOCKS_PER_SEC;
     printf("> All tests passed in %.2f ms\n", time_spent);
+#else
+    printf("> All tests passed\n");
+#endif
     printf_line();
     printf("%s", KNRM);
   } else {
-    printf("%s\n", KYEL);
+    printf("%s", KYEL);
     printf_line();
     printf("> Check messages above. %d assertion%s failed\n", total_failed,
            (total_failed == 1? "" : "s"));
@@ -61,7 +70,9 @@ void begin_section(const char* name){
   strcpy(section_name, name);
   assert_no = 1;
   failed = 0;
-  section_start = clock();
+#ifdef PRINT_TIMINGS
+    section_start = clock();
+#endif
 }
 
 void set_cleanup(void (*func)(void)){
@@ -69,15 +80,17 @@ void set_cleanup(void (*func)(void)){
 }
 
 void end_section(void){
-  if (failed){
-
-  } else if (print_sec_ok){
-    printf("%s", KGRN);
-    clock_t end = clock();
-    double time_spent = (double)(end - section_start) * 1000 / CLOCKS_PER_SEC;
-    printf("\n\nSection '%s' passed in %.2f ms\n", section_name, time_spent);
-    printf("%s", KNRM);
-  }
+#ifdef PRINT_TIMINGS
+  printf("%s", KGRN);
+  clock_t end = clock();
+  double time_spent = (double)(end - section_start) * 1000 / CLOCKS_PER_SEC;
+  printf("\nSection '%s' passed in %.2f ms\n", section_name, time_spent);
+  printf("%s", KNRM);
+#else
+  printf("%s", KGRN);
+  printf("\nSection '%s' passed\n", section_name);
+  printf("%s", KNRM);
+#endif
   assert_no = INT_MIN;
   total_failed += failed;
   free(section_name);
@@ -116,11 +129,11 @@ void __assert_eq(const char* expr_str_a, const char* expr_str_b, int a, int b,
     printf("Source:\t\t%s, line %d\n",file, line);
     printf("%s", KNRM);
 
-    #ifdef STOPFAIL
-      if (cleanup_func) cleanup_func();
-      exit(1);
-    #endif
-    
+#ifdef STOPFAIL
+    if (cleanup_func) cleanup_func();
+    exit(1);
+#endif
+
     failed++;
   } else {
     printf(".");

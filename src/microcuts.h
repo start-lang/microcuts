@@ -11,11 +11,17 @@
 #   define assert_str_eq(A, B) ;
 #endif
 
+#ifdef BENCHMARK
+#define HIDE_SECTION
+#endif
+
 void start_tests(void);
 void end_tests(void);
 void begin_section(const char* name);
 void end_section(void);
-void set_cleanup(void (*func)(void));
+void set_cleanup(int (*func)(void));
+void set_target(void (*func)(void));
+int run_target(void);
 void __assert(const char* expr_str, int a, const char* file, int line);
 void __assert_eq(const char* expr_str_a, const char* expr_str_b, int a, int b,
                  const char* file, int line);

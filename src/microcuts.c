@@ -23,20 +23,20 @@ char * section_name = NULL;
 int total_failed = 0;
 int total_asserts = 0;
 int section_asserts = 0;
-void (*cleanup_func)(void) = NULL;
+int (*cleanup_func)(void) = NULL;
+void (*target_func)(void) = NULL;
+int operations = 0;
 #ifdef PRINT_TIMINGS
-clock_t start = 0;
+double duration = 0;
 clock_t section_start = 0;
 #endif
 
 void start_tests(void){
+  setvbuf(stdout, NULL, _IONBF, 0);
   assert_no = INT_MIN;
   failed = 0;
   section_name = NULL;
   total_failed = 0;
-#ifdef PRINT_TIMINGS
-  start = clock();
-#endif
 }
 
 void printf_line(void){
@@ -45,13 +45,14 @@ void printf_line(void){
 }
 
 void end_tests(void){
+#ifdef HIDE_SECTION
+  printf("\n");
+#endif
   if (total_failed == 0){
     printf("%s", KGRN);
     printf_line();
 #ifdef PRINT_TIMINGS
-    clock_t end = clock();
-    double time_spent = (double)(end - start) * 1000 / CLOCKS_PER_SEC;
-    printf("> %d tests passed in %.2f ms\n", time_spent);
+    printf("> %d tests passed in %.2f ms (%.2f mop/s)\n", total_asserts, duration, operations / (duration * 1000));
 #else
     printf("> %d tests passed\n", total_asserts);
 #endif
@@ -78,21 +79,47 @@ void begin_section(const char* name){
 #endif
 }
 
-void set_cleanup(void (*func)(void)){
+void set_cleanup(int (*func)(void)){
   cleanup_func = func;
+}
+
+void set_target(void (*func)(void)){
+  target_func = func;
+}
+
+int run_target(void){
+  start_tests();
+#ifdef BENCHMARK
+  printf("%s", KCYN);
+  printf_line();
+  printf("> Benchmarking %d iterations...", BENCHMARK);
+  printf("%s", KNRM);
+  for (int i = 0; i < BENCHMARK; i++) {
+    if (target_func) target_func();
+  }
+#else
+  if (target_func) target_func();
+#endif
+  end_tests();
+  return total_failed;
 }
 
 void end_section(void){
 #ifdef PRINT_TIMINGS
-  printf("%s", KGRN);
   clock_t end = clock();
   double time_spent = (double)(end - section_start) * 1000 / CLOCKS_PER_SEC;
+  duration += time_spent;
+#ifndef HIDE_SECTION
+  printf("%s", KGRN);
   printf("\n%d tests passed @ '%s' in %.2f ms\n", section_asserts, section_name, time_spent);
   printf("%s", KNRM);
+#endif
 #else
+#ifndef HIDE_SECTION
   printf("%s", KGRN);
   printf("\n%d tests passed @ '%s'\n", section_asserts, section_name);
   printf("%s", KNRM);
+#endif
 #endif
   assert_no = INT_MIN;
   total_failed += failed;
@@ -114,10 +141,14 @@ void __assert(const char* expr_str, int a, const char* file, int line){
     printf("Source:\t\t%s, line %d\n",file, line);
     printf("%s", KNRM);
     failed++;
+  } else {
+#ifndef BENCHMARK
+    printf(".");
+#endif
   }
   assert_no++;
   section_asserts++;
-  if (cleanup_func) cleanup_func();
+  if (cleanup_func) operations += cleanup_func();
 }
 
 void __assert_eq(const char* expr_str_a, const char* expr_str_b, int a, int b,
@@ -141,11 +172,13 @@ void __assert_eq(const char* expr_str_a, const char* expr_str_b, int a, int b,
 
     failed++;
   } else {
+#ifndef BENCHMARK
     printf(".");
+#endif
   }
   assert_no++;
   section_asserts++;
-  if (cleanup_func) cleanup_func();
+  if (cleanup_func) operations += cleanup_func();
 }
 
 void __assert_str_eq(const char* expr_str_a, const char* expr_str_b,
@@ -163,9 +196,11 @@ void __assert_str_eq(const char* expr_str_a, const char* expr_str_b,
     printf("%s", KNRM);
     failed++;
   } else {
+#ifndef BENCHMARK
     printf(".");
+#endif
   }
   assert_no++;
   section_asserts++;
-  if (cleanup_func) cleanup_func();
+  if (cleanup_func) operations += cleanup_func();
 }

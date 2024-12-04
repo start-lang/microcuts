@@ -27,7 +27,7 @@ int (*cleanup_func)(void) = NULL;
 void (*target_func)(void) = NULL;
 int operations = 0;
 #ifdef PRINT_TIMINGS
-double duration = 0;
+clock_t start = 0;
 clock_t section_start = 0;
 #endif
 
@@ -45,6 +45,10 @@ void printf_line(void){
 }
 
 void end_tests(void){
+#ifdef PRINT_TIMINGS
+  clock_t end = clock();
+  double duration = (double)(end - start) * 1000 / CLOCKS_PER_SEC;
+#endif
 #ifdef HIDE_SECTION
   printf("\n");
 #endif
@@ -94,10 +98,16 @@ int run_target(void){
   printf_line();
   printf("> Benchmarking %d iterations...", BENCHMARK);
   printf("%s", KNRM);
+#ifdef PRINT_TIMINGS
+  start = clock();
+#endif
   for (int i = 0; i < BENCHMARK; i++) {
     if (target_func) target_func();
   }
 #else
+#ifdef PRINT_TIMINGS
+  start = clock();
+#endif
   if (target_func) target_func();
 #endif
   end_tests();
@@ -106,11 +116,10 @@ int run_target(void){
 
 void end_section(void){
 #ifdef PRINT_TIMINGS
-  clock_t end = clock();
-  double time_spent = (double)(end - section_start) * 1000 / CLOCKS_PER_SEC;
-  duration += time_spent;
 #ifndef HIDE_SECTION
   printf("%s", KGRN);
+  clock_t end = clock();
+  double time_spent = (double)(end - section_start) * 1000 / CLOCKS_PER_SEC;
   printf("\n%d tests passed @ '%s' in %.2f ms\n", section_asserts, section_name, time_spent);
   printf("%s", KNRM);
 #endif

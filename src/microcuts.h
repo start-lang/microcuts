@@ -1,6 +1,10 @@
 #ifndef ASSERT_H
 #define ASSERT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef NDEBUG
 #   define assert(A) __assert(#A, A, __FILE__, __LINE__)
 #   define assert_eq(A, B) __assert_eq(#A, #B, A, B, __FILE__, __LINE__)
@@ -27,5 +31,9 @@ void __assert_eq(const char* expr_str_a, const char* expr_str_b, int a, int b,
                  const char* file, int line);
 void __assert_str_eq(const char* expr_str_a, const char* expr_str_b,
                      const char* a, const char* b, const char* file, int line);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

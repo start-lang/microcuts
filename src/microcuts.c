@@ -37,6 +37,13 @@ void start_tests(void){
   failed = 0;
   section_name = NULL;
   total_failed = 0;
+  total_asserts = 0;
+  section_asserts = 0;
+  operations = 0;
+#ifdef PRINT_TIMINGS
+  start = 0;
+  section_start = 0;
+#endif
 }
 
 void printf_line(void){

@@ -128,7 +128,7 @@ void end_section(void){
   section_name = NULL;
 }
 
-void __assert(const char* expr_str, int a, const char* file, int line){
+void mc_assert(const char* expr_str, int a, const char* file, int line){
   if (!a){
     if (assert_no < 0){
       printf("%s", KRED);
@@ -151,7 +151,7 @@ void __assert(const char* expr_str, int a, const char* file, int line){
   if (cleanup_func) operations += cleanup_func();
 }
 
-void __assert_eq(const char* expr_str_a, const char* expr_str_b, int a, int b,
+void mc_assert_eq(const char* expr_str_a, const char* expr_str_b, int a, int b,
                  const char* file, int line){
   if (a != b){
     if (assert_no < 0){
@@ -181,7 +181,7 @@ void __assert_eq(const char* expr_str_a, const char* expr_str_b, int a, int b,
   if (cleanup_func) operations += cleanup_func();
 }
 
-void __assert_str_eq(const char* expr_str_a, const char* expr_str_b,
+void mc_assert_str_eq(const char* expr_str_a, const char* expr_str_b,
                      const char* a, const char* b, const char* file, int line){
   if (strcmp(a, b)){
     if (assert_no < 0){

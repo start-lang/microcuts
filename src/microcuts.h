@@ -6,9 +6,9 @@ extern "C" {
 #endif
 
 #ifndef NDEBUG
-#   define assert(A) __assert(#A, A, __FILE__, __LINE__)
-#   define assert_eq(A, B) __assert_eq(#A, #B, A, B, __FILE__, __LINE__)
-#   define assert_str_eq(A, B) __assert_str_eq(#A, #B, A, B, __FILE__, __LINE__)
+#   define assert(A) mc_assert(#A, A, __FILE__, __LINE__)
+#   define assert_eq(A, B) mc_assert_eq(#A, #B, A, B, __FILE__, __LINE__)
+#   define assert_str_eq(A, B) mc_assert_str_eq(#A, #B, A, B, __FILE__, __LINE__)
 #else
 #   define assert(A) ;
 #   define assert_eq(A, B) ;
@@ -26,10 +26,10 @@ void end_section(void);
 void set_cleanup(int (*func)(void));
 void set_target(void (*func)(void));
 int run_target(void);
-void __assert(const char* expr_str, int a, const char* file, int line);
-void __assert_eq(const char* expr_str_a, const char* expr_str_b, int a, int b,
+void mc_assert(const char* expr_str, int a, const char* file, int line);
+void mc_assert_eq(const char* expr_str_a, const char* expr_str_b, int a, int b,
                  const char* file, int line);
-void __assert_str_eq(const char* expr_str_a, const char* expr_str_b,
+void mc_assert_str_eq(const char* expr_str_a, const char* expr_str_b,
                      const char* a, const char* b, const char* file, int line);
 
 #ifdef __cplusplus
